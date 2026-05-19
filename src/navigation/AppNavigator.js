@@ -3,6 +3,7 @@ import { ActivityIndicator, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import ConnectBankScreen from "../screens/ConnectBankScreen";
 
 import HomeScreen from "../screens/HomeScreen";
 import TransactionsScreen from "../screens/TransactionsScreen";
@@ -50,6 +51,7 @@ function AppStack() {
       <Stack.Screen name="MainTabs" component={MainTabs} />
       <Stack.Screen name="AddTransaction" component={AddTransactionScreen} />
       <Stack.Screen name="EditTransaction" component={EditTransactionScreen} />
+      <Stack.Screen name="ConnectBank" component={ConnectBankScreen} />
     </Stack.Navigator>
   );
 }

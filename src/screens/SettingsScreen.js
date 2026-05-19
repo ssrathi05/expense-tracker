@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { styles } from "../styles/globalStyles";
 import { useAuth } from "../context/AuthContext";
 
-export default function SettingsScreen() {
+export default function SettingsScreen({ navigation }) {
   const { logOut, user } = useAuth();
 
   return (
@@ -20,10 +20,13 @@ export default function SettingsScreen() {
             <Text style={styles.categoryArrow}>{user?.email}</Text>
           </View>
 
-          <View style={styles.categoryCard}>
+          <TouchableOpacity
+            style={styles.categoryCard}
+            onPress={() => navigation.getParent()?.navigate("ConnectBank")}
+          >
             <Text style={styles.categoryName}>Connect Bank</Text>
             <Text style={styles.categoryArrow}>›</Text>
-          </View>
+          </TouchableOpacity>
 
           <View style={styles.categoryCard}>
             <Text style={styles.categoryName}>Export to CSV</Text>
