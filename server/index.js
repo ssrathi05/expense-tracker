@@ -59,6 +59,9 @@ app.post("/api/create_link_token", async (req, res) => {
 
 app.post("/api/exchange_public_token", async (req, res) => {
   try {
+    console.log("Exchange public token route hit");
+    console.log("Request body:", req.body);
+
     const { public_token } = req.body;
 
     const response = await plaidClient.itemPublicTokenExchange({
@@ -66,6 +69,8 @@ app.post("/api/exchange_public_token", async (req, res) => {
     });
 
     ACCESS_TOKEN = response.data.access_token;
+
+    console.log("Access token saved successfully");
 
     res.json({
       message: "Public token exchanged successfully",

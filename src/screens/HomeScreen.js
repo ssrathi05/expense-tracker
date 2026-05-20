@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+
 import {
   View,
   Text,
@@ -12,7 +14,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { styles } from "../styles/globalStyles";
 import { useAuth } from "../context/AuthContext";
-import { addTransaction, getTransactions } from "../services/transactionService";
+import {
+  addSampleTransaction,
+  getTransactions,
+} from "../services/transactionService";
 
 function getTopCategory(transactions) {
   if (transactions.length === 0) {
@@ -32,6 +37,7 @@ function getTopCategory(transactions) {
 
 const sampleTransactions = [
   {
+    sampleKey: "sample-starbucks",
     merchant: "Starbucks",
     amount: 6.42,
     category: "Coffee",
@@ -39,6 +45,7 @@ const sampleTransactions = [
     emoji: "☕",
   },
   {
+    sampleKey: "sample-target",
     merchant: "Target",
     amount: 38.21,
     category: "Shopping",
@@ -46,6 +53,7 @@ const sampleTransactions = [
     emoji: "🛍️",
   },
   {
+    sampleKey: "sample-chipotle",
     merchant: "Chipotle",
     amount: 12.75,
     category: "Food",
@@ -53,6 +61,7 @@ const sampleTransactions = [
     emoji: "🌯",
   },
   {
+    sampleKey: "sample-spotify",
     merchant: "Spotify",
     amount: 10.99,
     category: "Subscriptions",
@@ -88,21 +97,36 @@ export default function HomeScreen() {
 
   async function addSampleTransactions() {
     try {
+      let imported = 0;
+      let skipped = 0;
+
       for (const transaction of sampleTransactions) {
-        await addTransaction(user.uid, transaction);
+        const result = await addSampleTransaction(user.uid, transaction);
+        if (result === "imported") {
+          imported += 1;
+        } else {
+          skipped += 1;
+        }
       }
 
       await loadTransactions();
+
+      Alert.alert(
+        "Sample data",
+        `${imported} added. ${skipped} skipped (already in your account).`
+      );
     } catch (error) {
       Alert.alert("Error adding transactions", error.message);
     }
   }
 
-  useEffect(() => {
-    if (user) {
-      loadTransactions();
-    }
-  }, [user]);
+  useFocusEffect(
+    useCallback(() => {
+      if (user) {
+        loadTransactions();
+      }
+    }, [user])
+  );
 
   if (loading) {
     return (
