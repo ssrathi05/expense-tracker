@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { PlaidLink } from "react-native-plaid-link-sdk";
+import { create, open } from "react-native-plaid-link-sdk";
 
 import { styles } from "../styles/globalStyles";
 import { createLinkToken, exchangePublicToken } from "../services/plaidService";
@@ -28,21 +28,44 @@ export default function ConnectBankScreen({ navigation }) {
       }
 
       setLinkToken(data.link_token);
-      Alert.alert("Ready", "Plaid link token created. Tap Open Plaid.");
+
+      create({
+        token: data.link_token,
+      });
+
+      Alert.alert("Ready", "Plaid is ready. Tap Open Plaid.");
     } catch (error) {
+      console.log("Create link token error:", error);
       Alert.alert("Plaid error", error.message);
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleSuccess(success) {
+  function handleOpenPlaid() {
+    console.log("Open Plaid pressed");
+
     try {
-      await exchangePublicToken(success.publicToken);
-      Alert.alert("Bank connected", "Your bank was connected successfully.");
-      navigation.goBack();
+      open({
+        onSuccess: async (success) => {
+          console.log("Plaid success:", success);
+
+          try {
+            await exchangePublicToken(success.publicToken);
+            Alert.alert("Bank connected", "Your bank was connected successfully.");
+            navigation.goBack();
+          } catch (error) {
+            console.log("Token exchange error:", error);
+            Alert.alert("Token exchange error", error.message);
+          }
+        },
+        onExit: (exit) => {
+          console.log("Plaid exited:", exit);
+        },
+      });
     } catch (error) {
-      Alert.alert("Token exchange error", error.message);
+      console.log("Open Plaid error:", error);
+      Alert.alert("Open Plaid error", error.message);
     }
   }
 
@@ -62,19 +85,9 @@ export default function ConnectBankScreen({ navigation }) {
               <Text style={styles.buttonText}>Start Bank Connection</Text>
             </TouchableOpacity>
           ) : (
-            <PlaidLink
-              tokenConfig={{
-                token: linkToken,
-              }}
-              onSuccess={handleSuccess}
-              onExit={(exit) => {
-                console.log("Plaid exited:", exit);
-              }}
-            >
-              <View style={styles.button}>
-                <Text style={styles.buttonText}>Open Plaid</Text>
-              </View>
-            </PlaidLink>
+            <TouchableOpacity style={styles.button} onPress={handleOpenPlaid}>
+              <Text style={styles.buttonText}>Open Plaid</Text>
+            </TouchableOpacity>
           )}
 
           <TouchableOpacity

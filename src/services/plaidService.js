@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://10.51.180.74:5000";
+const API_BASE_URL = "http://192.168.1.172:5000";
 export async function createLinkToken() {
   const response = await fetch(`${API_BASE_URL}/api/create_link_token`, {
     method: "POST",
